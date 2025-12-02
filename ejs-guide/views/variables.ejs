@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Variables</title>
+  </head>
+  <body>
+    <h1>Variables</h1>
+    <h2><%=title%></h2>
+    <section>
+      <h1>1. Output variables</h1>
+      <div>
+        <p>Name: <%=user.name%></p>
+        <p>Age: <%=user.age%></p>
+        <p>Email: <%=user.email%></p>
+        <p>Active Status: <%=user.isActive ? 'Active':'Inactive'%></p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Javascript Variables</h2>
+      <%const greeting = 'Hello ' + user.name%>
+      <p><%=greeting%></p>
+    </section>
+  </body>
+</html>
