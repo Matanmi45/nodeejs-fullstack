@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
+const MongoStore = require("connect-mongo");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // Session middleware
+
 app.use(
   session({
     secret: process.env.JWT_SECRET || "your-secret-key",
@@ -25,6 +27,10 @@ app.use(
       secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      ttl: 24 * 60 * 60 * 1000, // 24 hours
+    }),
   })
 );
 
@@ -47,12 +53,15 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // User Schema
-const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  resetPasswordToken: String,
-  resetPasswordExpires: Date,
-});
+const userSchema = new mongoose.Schema(
+  {
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
+  },
+  { timestamps: true }
+);
 
 const User = mongoose.model("User", userSchema);
 
@@ -145,6 +154,7 @@ app.get("/register", (req, res) => {
 
 app.post("/register", async (req, res) => {
   try {
+    console.log("Registration data:", req.body);
     const { email, password, confirmPassword } = req.body;
 
     // Check if passwords match
@@ -254,6 +264,7 @@ app.post("/forgot-password", async (req, res) => {
 });
 
 app.get("/reset-password/:token", (req, res) => {
+  console.log(req.params);
   res.render("reset-password", { token: req.params.token });
 });
 
